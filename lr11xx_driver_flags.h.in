@@ -1,0 +1,21 @@
+/*
+ * lr11xx_driver_flags.h
+ *
+ *  Created on: 09 mar. 2026
+ *      Author: Ludo
+ */
+
+#ifndef __LR11XX_DRIVER_FLAGS_H__
+#define __LR11XX_DRIVER_FLAGS_H__
+
+/*** LR11XX driver compilation flags ***/
+
+#cmakedefine LR11XX_DRIVER_GPIO_ERROR_BASE_LAST     @LR11XX_DRIVER_GPIO_ERROR_BASE_LAST@
+#cmakedefine LR11XX_DRIVER_SPI_ERROR_BASE_LAST      @LR11XX_DRIVER_SPI_ERROR_BASE_LAST@
+#cmakedefine LR11XX_DRIVER_DELAY_ERROR_BASE_LAST    @LR11XX_DRIVER_SPI_ERROR_BASE_LAST@
+
+#cmakedefine LR11XX_DRIVER_TX_ENABLE
+#cmakedefine LR11XX_DRIVER_RX_ENABLE
+#cmakedefine LR11XX_DRIVER_WIFI_ENABLE
+
+#endif /* __LR11XX_DRIVER_FLAGS_H__ */
