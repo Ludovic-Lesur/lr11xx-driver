@@ -54,6 +54,7 @@ typedef enum {
     LR11XX_ERROR_OSCILLATOR,
     LR11XX_ERROR_TCXO_VOLTAGE,
     LR11XX_ERROR_TCXO_TIMEOUT,
+    LR11XX_ERROR_LF_CLOCK,
     LR11XX_ERROR_CALIBRATION_TIMEOUT,
     LR11XX_ERROR_MODE,
     LR11XX_ERROR_RF_FREQUENCY_OVERFLOW,
@@ -128,6 +129,17 @@ typedef enum {
     LR11XX_TCXO_VOLTAGE_3V3,
     LR11XX_TCXO_VOLTAGE_LAST
 } LR11XX_tcxo_voltage_t;
+
+/*!******************************************************************
+ * \enum LR11XX_lf_clock_t
+ * \brief LR11XX low frequency clocks list.
+ *******************************************************************/
+typedef enum {
+    LR11XX_LF_CLOCK_INTERNAL_RC = 0,
+    LR11XX_LF_CLOCK_EXTERNAL_CRYSTAL,
+    LR11XX_LF_CLOCK_EXTERNAL_DIO11,
+    LR11XX_LF_CLOCK_LAST
+} LR11XX_lf_clock_t;
 
 /*!******************************************************************
  * \enum LR11XX_mode_t
@@ -472,10 +484,11 @@ LR11XX_status_t LR11XX_set_regulation_mode(LR11XX_regulation_mode_t regulation_m
  * \param[in]   oscillator: Oscillator type.
  * \param[in]   tcxo_voltage: TCXO control voltage on DIO3.
  * \param[in]   tcxo_timeout_ms: TCXO startup timeout in ms.
+ * \param[in]   lf_clock: Low frequency clock selection.
  * \param[out]  none
  * \retval      Function execution status.
  *******************************************************************/
-LR11XX_status_t LR11XX_set_oscillator(LR11XX_oscillator_t oscillator, LR11XX_tcxo_voltage_t tcxo_voltage, uint32_t tcxo_timeout_ms);
+LR11XX_status_t LR11XX_set_oscillator(LR11XX_oscillator_t oscillator, LR11XX_tcxo_voltage_t tcxo_voltage, uint32_t tcxo_timeout_ms, LR11XX_lf_clock_t lf_clock);
 
 /*!******************************************************************
  * \fn LR11XX_status_t LR11XX_calibrate(uint16_t frequency_range_low_mhz, uint16_t frequency_range_high_mhz)

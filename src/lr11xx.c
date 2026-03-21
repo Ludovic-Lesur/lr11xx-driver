@@ -444,7 +444,7 @@ errors:
 }
 
 /*******************************************************************/
-LR11XX_status_t LR11XX_set_oscillator(LR11XX_oscillator_t oscillator, LR11XX_tcxo_voltage_t tcxo_voltage, uint32_t tcxo_timeout_ms) {
+LR11XX_status_t LR11XX_set_oscillator(LR11XX_oscillator_t oscillator, LR11XX_tcxo_voltage_t tcxo_voltage, uint32_t tcxo_timeout_ms, LR11XX_lf_clock_t lf_clock) {
     // Local variables.
     LR11XX_status_t status = LR11XX_SUCCESS;
     uint8_t command[LR11XX_COMMAND_SIZE_SET_TCXO_MODE] = { (uint8_t) (LR11XX_OP_CODE_SET_TCXO_MODE >> 8), (uint8_t) (LR11XX_OP_CODE_SET_TCXO_MODE >> 0), 0x00, 0x00, 0x00, 0x00 };
@@ -480,6 +480,17 @@ LR11XX_status_t LR11XX_set_oscillator(LR11XX_oscillator_t oscillator, LR11XX_tcx
         status = LR11XX_ERROR_OSCILLATOR;
         goto errors;
     }
+    // Check low frequency clock.
+    if (lf_clock >= LR11XX_LF_CLOCK_LAST) {
+        status = LR11XX_ERROR_LF_CLOCK;
+        goto errors;
+    }
+    command[0] = (uint8_t) (LR11XX_OP_CODE_CONFIG_LF_CLOCK >> 8);
+    command[1] = (uint8_t) (LR11XX_OP_CODE_CONFIG_LF_CLOCK >> 0);
+    command[2] = ((0b1 << 2) | (lf_clock & 0x03));
+    // Send command.
+    status = _LR11XX_write_command(command, LR11XX_COMMAND_SIZE_CONFIG_LF_CLOCK);
+    if (status != LR11XX_SUCCESS) goto errors;
 errors:
     return status;
 }
