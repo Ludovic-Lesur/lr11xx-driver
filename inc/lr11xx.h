@@ -627,6 +627,17 @@ LR11XX_status_t LR11XX_get_rssi(LR11XX_rssi_t rssi_type, int16_t* rssi_dbm);
 
 #ifdef LR11XX_DRIVER_RX_ENABLE
 /*!******************************************************************
+ * \fn LR11XX_status_t LR11XX_clear_fifo(void)
+ * \brief Clear LR11XX FIFO.
+ * \param[in]   none
+ * \param[out]  none
+ * \retval      Function execution status.
+ *******************************************************************/
+LR11XX_status_t LR11XX_clear_fifo(void);
+#endif
+
+#ifdef LR11XX_DRIVER_RX_ENABLE
+/*!******************************************************************
  * \fn LR11XX_status_t LR11XX_read_fifo(uint8_t* rx_data, uint8_t rx_data_size)
  * \brief Read LR11XX FIFO.
  * \param[in]   rx_data_size: Number of bytes to read.

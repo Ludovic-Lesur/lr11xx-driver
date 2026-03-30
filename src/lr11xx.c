@@ -1056,6 +1056,20 @@ errors:
 
 #ifdef LR11XX_DRIVER_RX_ENABLE
 /*******************************************************************/
+LR11XX_status_t LR11XX_clear_fifo(void) {
+    // Local variables.
+    LR11XX_status_t status = LR11XX_SUCCESS;
+    uint8_t command[LR11XX_COMMAND_SIZE_CLEAR_RX_BUFFER] = { (uint8_t) (LR11XX_OP_CODE_CLEAR_RX_BUFFER >> 8), (uint8_t) (LR11XX_OP_CODE_CLEAR_RX_BUFFER >> 0) };
+    // Send command.
+    status = _LR11XX_write_command(command, LR11XX_COMMAND_SIZE_CLEAR_RX_BUFFER);
+    if (status != LR11XX_SUCCESS) goto errors;
+errors:
+    return status;
+}
+#endif
+
+#ifdef LR11XX_DRIVER_RX_ENABLE
+/*******************************************************************/
 LR11XX_status_t LR11XX_read_fifo(uint8_t* rx_data, uint8_t rx_data_size) {
     // Local variables.
     LR11XX_status_t status = LR11XX_SUCCESS;
