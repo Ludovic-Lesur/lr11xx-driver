@@ -764,8 +764,8 @@ LR11XX_status_t LR11XX_set_gfsk_packet(LR11XX_gfsk_packet_parameters_t* packet_p
     status = _LR11XX_write_command(command, LR11XX_COMMAND_SIZE_SET_PACKET_PARAMS_GFSK);
     if (status != LR11XX_SUCCESS) goto errors;
     // Sync word.
-    command[0] = (uint8_t) (LR11XX_COMMAND_SIZE_SET_GFSK_SYNC_WORD >> 8);
-    command[1] = (uint8_t) (LR11XX_COMMAND_SIZE_SET_GFSK_SYNC_WORD >> 0);
+    command[0] = (uint8_t) (LR11XX_OP_CODE_SET_GFSK_SYNC_WORD >> 8);
+    command[1] = (uint8_t) (LR11XX_OP_CODE_SET_GFSK_SYNC_WORD >> 0);
     for (idx = 0; idx < LR11XX_SYNC_WORD_SIZE_BYTES_MAX; idx++) {
         command[2 + idx] = (packet_parameters->sync_word[idx]);
     }
