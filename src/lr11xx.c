@@ -27,8 +27,8 @@
 #define LR11XX_IMAGE_CALIBRATION_STEP_MHZ       4
 
 #define LR11XX_WIFI_BASIC_RESULT_SIZE_BYTES     9
-#define LR11XX_WIFI_RESPONSE_SIZE_BYTES         (LR11XX_RESPONSE_SIZE_WIFI_READ_RESULTS + (LR11XX_WIFI_MAC_ADDRESS_LIST_SIZE_MAX * LR11XX_WIFI_BASIC_RESULT_SIZE_BYTES))
-#define LR11XX_WIFI_RESPONSE_RESULT_OFFSET      (LR11XX_RESPONSE_SIZE_WIFI_READ_RESULTS + (LR11XX_WIFI_BASIC_RESULT_SIZE_BYTES * result_idx))
+#define LR11XX_WIFI_RESPONSE_SIZE_BYTES(n)      ((uint8_t) (LR11XX_RESPONSE_SIZE_WIFI_READ_RESULTS + (n * LR11XX_WIFI_BASIC_RESULT_SIZE_BYTES)))
+#define LR11XX_WIFI_RESPONSE_RESULT_OFFSET      ((uint8_t) (LR11XX_RESPONSE_SIZE_WIFI_READ_RESULTS + (LR11XX_WIFI_BASIC_RESULT_SIZE_BYTES * result_idx)))
 
 /*** LR11XX local structures ***/
 
@@ -1112,16 +1112,12 @@ errors:
 
 #ifdef LR11XX_DRIVER_WIFI_ENABLE
 /*******************************************************************/
-LR11XX_status_t LR11XX_wifi_scan(LR11XX_wifi_scan_parameters_t* wifi_scan_parameters, LR11XX_wifi_scan_results_t* wifi_scan_results) {
+LR11XX_status_t LR11XX_wifi_scan(LR11XX_wifi_scan_parameters_t* wifi_scan_parameters) {
     // Local variables.
     LR11XX_status_t status = LR11XX_SUCCESS;
     uint8_t command[LR11XX_COMMAND_SIZE_WIFI_SCAN] = { 0x00 };
-    uint8_t response[LR11XX_WIFI_RESPONSE_SIZE_BYTES];
-    uint8_t number_of_results = 0;
-    uint8_t result_idx = 0;
-    uint8_t byte_idx = 0;
     // Check parameters.
-    if ((wifi_scan_parameters == NULL) || (wifi_scan_results == NULL)) {
+    if (wifi_scan_parameters == NULL) {
         status = LR11XX_ERROR_NULL_PARAMETER;
         goto errors;
     }
@@ -1145,20 +1141,13 @@ LR11XX_status_t LR11XX_wifi_scan(LR11XX_wifi_scan_parameters_t* wifi_scan_parame
         status = LR11XX_ERROR_WIFI_SINGLE_SCAN_TIMEOUT;
         goto errors;
     }
-    if ((wifi_scan_results->access_point_list_size) == 0) {
-        status = LR11XX_ERROR_WIFI_ACCESS_POINT_LIST_SIZE;
-        goto errors;
-    }
-    // Reset results.
-    wifi_scan_results->number_of_access_points_written = 0;
-    wifi_scan_results->number_of_access_points_detected = 0;
     // Build WiFi scan command.
     command[0] = (uint8_t) (LR11XX_OP_CODE_WIFI_SCAN >> 8);
     command[1] = (uint8_t) (LR11XX_OP_CODE_WIFI_SCAN >> 0);
-    command[2] = ((wifi_scan_parameters->signal_type) + 1);
+    command[2] = (wifi_scan_parameters->signal_type);
     command[3] = (uint8_t) ((wifi_scan_parameters->channel_mask) >> 8);
     command[4] = (uint8_t) ((wifi_scan_parameters->channel_mask) >> 0);
-    command[5] = ((wifi_scan_parameters->acquisition_mode) + 1);
+    command[5] = (wifi_scan_parameters->acquisition_mode);
     command[6] = (wifi_scan_parameters->mac_address_list_size);
     command[7] = (wifi_scan_parameters->number_of_scans_per_channel);
     command[8] = (uint8_t) ((wifi_scan_parameters->single_scan_timeout_ms) >> 8);
@@ -1167,12 +1156,33 @@ LR11XX_status_t LR11XX_wifi_scan(LR11XX_wifi_scan_parameters_t* wifi_scan_parame
     // Send command.
     status = _LR11XX_write_command(command, LR11XX_COMMAND_SIZE_WIFI_SCAN);
     if (status != LR11XX_SUCCESS) goto errors;
-    // Wait for scan to complete.
-    status = LR11XX_HW_wait_busy_low();
-    if (status != LR11XX_SUCCESS) {
-        status = LR11XX_ERROR_BUSY_TIMEOUT;
+errors:
+    return status;
+}
+#endif
+
+#ifdef LR11XX_DRIVER_WIFI_ENABLE
+/*******************************************************************/
+LR11XX_status_t LR11XX_wifi_read(LR11XX_wifi_scan_results_t* wifi_scan_results) {
+    // Local variables.
+    LR11XX_status_t status = LR11XX_SUCCESS;
+    uint8_t command[LR11XX_COMMAND_SIZE_WIFI_SCAN] = { 0x00 };
+    uint8_t response[LR11XX_WIFI_RESPONSE_SIZE_BYTES(LR11XX_WIFI_MAC_ADDRESS_LIST_SIZE_MAX)];
+    uint8_t number_of_results = 0;
+    uint8_t result_idx = 0;
+    uint8_t byte_idx = 0;
+    // Check parameters.
+    if (wifi_scan_results == NULL) {
+        status = LR11XX_ERROR_NULL_PARAMETER;
         goto errors;
     }
+    if ((wifi_scan_results->access_point_list_size) == 0) {
+        status = LR11XX_ERROR_WIFI_ACCESS_POINT_LIST_SIZE;
+        goto errors;
+    }
+    // Reset results.
+    wifi_scan_results->number_of_access_points_written = 0;
+    wifi_scan_results->number_of_access_points_detected = 0;
     // Read number of results.
     command[0] = (uint8_t) (LR11XX_OP_CODE_WIFI_GET_NB_RESULTS >> 8);
     command[1] = (uint8_t) (LR11XX_OP_CODE_WIFI_GET_NB_RESULTS >> 0);
@@ -1189,16 +1199,16 @@ LR11XX_status_t LR11XX_wifi_scan(LR11XX_wifi_scan_parameters_t* wifi_scan_parame
     command[3] = number_of_results;
     command[4] = 0x04;
     // Send command.
-    status = _LR11XX_read_command(command, LR11XX_COMMAND_SIZE_WIFI_READ_RESULTS, response, LR11XX_WIFI_RESPONSE_SIZE_BYTES);
+    status = _LR11XX_read_command(command, LR11XX_COMMAND_SIZE_WIFI_READ_RESULTS, response, LR11XX_WIFI_RESPONSE_SIZE_BYTES(number_of_results));
     if (status != LR11XX_SUCCESS) goto errors;
     // Parse results.
     for (result_idx = 0; result_idx < number_of_results; result_idx++) {
         // Check size.
         if (result_idx >= (wifi_scan_results->access_point_list_size)) break;
         // Metadata.
-        wifi_scan_results->access_point_list[result_idx].signal_type = response[LR11XX_WIFI_RESPONSE_RESULT_OFFSET + 0];
+        wifi_scan_results->access_point_list[result_idx].wifi_type.all = response[LR11XX_WIFI_RESPONSE_RESULT_OFFSET + 0];
         wifi_scan_results->access_point_list[result_idx].channel_info.all = response[LR11XX_WIFI_RESPONSE_RESULT_OFFSET + 1];
-        wifi_scan_results->access_point_list[result_idx].rssi_dbm = (-1) * ((int16_t) (response[LR11XX_WIFI_RESPONSE_RESULT_OFFSET + 2] >> 1));
+        wifi_scan_results->access_point_list[result_idx].rssi_dbm = (int8_t) response[LR11XX_WIFI_RESPONSE_RESULT_OFFSET + 2];
         // MAC address.
         for (byte_idx = 0; byte_idx < LR11XX_WIFI_MAC_ADDRESS_SIZE_BYTES; byte_idx++) {
             wifi_scan_results->access_point_list[result_idx].mac_address[byte_idx] = response[LR11XX_WIFI_RESPONSE_RESULT_OFFSET + 3 + byte_idx];

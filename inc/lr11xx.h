@@ -308,23 +308,35 @@ typedef enum {
  * \brief LR11XX WiFi signal types list.
  *******************************************************************/
 typedef enum {
-    LR11XX_WIFI_SIGNAL_TYPE_B = 0,
-    LR11XX_WIFI_SIGNAL_TYPE_G,
-    LR11XX_WIFI_SIGNAL_TYPE_N,
-    LR11XX_WIFI_SIGNAL_TYPE_ALL,
+    LR11XX_WIFI_SIGNAL_TYPE_B = 0x01,
+    LR11XX_WIFI_SIGNAL_TYPE_G = 0x02,
+    LR11XX_WIFI_SIGNAL_TYPE_N = 0x03,
+    LR11XX_WIFI_SIGNAL_TYPE_ALL = 0x04,
     LR11XX_WIFI_SIGNAL_TYPE_LAST
 } LR11XX_wifi_signal_type_t;
+
+/*!******************************************************************
+ * \struct LR11XX_wifi_type_t
+ * \brief LR11XX WiFi types structure.
+ *******************************************************************/
+typedef union {
+    uint8_t all;
+    struct {
+        unsigned signal_type :2;
+        unsigned datarate_id :6;
+    } __attribute__((packed));
+} LR11XX_wifi_type_t;
 
 /*!******************************************************************
  * \enum LR11XX_wifi_signal_type_t
  * \brief LR11XX WiFi signal types list.
  *******************************************************************/
 typedef enum {
-    LR11XX_WIFI_ACQUISITION_MODE_BEACON = 0,
-    LR11XX_WIFI_ACQUISITION_MODE_BEACON_PACKET,
-    LR11XX_WIFI_ACQUISITION_MODE_FULL_TRAFFIC,
-    LR11XX_WIFI_ACQUISITION_MODE_FULL_BEACON,
-    LR11XX_WIFI_ACQUISITION_MODE_SSID_BEACON,
+    LR11XX_WIFI_ACQUISITION_MODE_BEACON = 0x01,
+    LR11XX_WIFI_ACQUISITION_MODE_BEACON_PACKET = 0x02,
+    LR11XX_WIFI_ACQUISITION_MODE_FULL_TRAFFIC = 0x03,
+    LR11XX_WIFI_ACQUISITION_MODE_FULL_BEACON = 0x04,
+    LR11XX_WIFI_ACQUISITION_MODE_SSID_BEACON = 0x05,
     LR11XX_WIFI_ACQUISITION_MODE_LAST
 } LR11XX_wifi_acquisition_mode_t;
 
@@ -405,9 +417,9 @@ typedef struct {
  * \brief LR11XX passive WiFi scan parameters structure.
  *******************************************************************/
 typedef struct {
-    LR11XX_wifi_signal_type_t signal_type;
+    LR11XX_wifi_type_t wifi_type;
     LR11XX_wifi_channel_info_t channel_info;
-    int16_t rssi_dbm;
+    int8_t rssi_dbm;
     uint8_t mac_address[LR11XX_WIFI_MAC_ADDRESS_SIZE_BYTES];
 } LR11XX_wifi_access_point_t;
 
@@ -649,13 +661,24 @@ LR11XX_status_t LR11XX_read_fifo(uint8_t* rx_data, uint8_t rx_data_size);
 
 #ifdef LR11XX_DRIVER_WIFI_ENABLE
 /*!******************************************************************
- * \fn LR11XX_status_t LR11XX_wifi_scan(LR11XX_wifi_scan_parameters_t* wifi_scan_parameters, LR11XX_wifi_scan_results_t* wifi_scan_results)
+ * \fn LR11XX_status_t LR11XX_wifi_scan(LR11XX_wifi_scan_parameters_t* wifi_scan_parameters)
  * \brief Perform a passive WiFi scan.
  * \param[in]   wifi_scan_parameters: Pointer to the scan parameters.
+ * \param[out]  none
+ * \retval      Function execution status.
+ *******************************************************************/
+LR11XX_status_t LR11XX_wifi_scan(LR11XX_wifi_scan_parameters_t* wifi_scan_parameters);
+#endif
+
+#ifdef LR11XX_DRIVER_WIFI_ENABLE
+/*!******************************************************************
+ * \fn LR11XX_status_t LR11XX_wifi_read(LR11XX_wifi_scan_results_t* wifi_scan_results)
+ * \brief Perform a passive WiFi scan.
+ * \param[in]   none
  * \param[out]  wifi_scan_results: Pointer to the scan results.
  * \retval      Function execution status.
  *******************************************************************/
-LR11XX_status_t LR11XX_wifi_scan(LR11XX_wifi_scan_parameters_t* wifi_scan_parameters, LR11XX_wifi_scan_results_t* wifi_scan_results);
+LR11XX_status_t LR11XX_wifi_read(LR11XX_wifi_scan_results_t* wifi_scan_results);
 #endif
 
 /*******************************************************************/
