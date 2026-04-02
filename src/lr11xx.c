@@ -30,6 +30,9 @@
 #define LR11XX_WIFI_RESPONSE_SIZE_BYTES(n)      ((uint8_t) (LR11XX_RESPONSE_SIZE_WIFI_READ_RESULTS + (n * LR11XX_WIFI_BASIC_RESULT_SIZE_BYTES)))
 #define LR11XX_WIFI_RESPONSE_RESULT_OFFSET      ((uint8_t) (LR11XX_RESPONSE_SIZE_WIFI_READ_RESULTS + (LR11XX_WIFI_BASIC_RESULT_SIZE_BYTES * result_idx)))
 
+#define LR11XX_LP_PA_POWER_TABLE_SIZE           (LR11XX_RF_OUTPUT_POWER_LP_PA_DBM_MAX - LR11XX_RF_OUTPUT_POWER_LP_PA_DBM_MIN + 1)
+#define LR11XX_HP_PA_POWER_TABLE_SIZE           (LR11XX_RF_OUTPUT_POWER_HP_PA_DBM_MAX - LR11XX_RF_OUTPUT_POWER_HP_PA_DBM_MIN + 1)
+
 /*** LR11XX local structures ***/
 
 /*******************************************************************/
@@ -231,11 +234,95 @@ typedef enum {
     LR11XX_RESPONSE_SIZE_WIFI_READ_RESULTS = 1
 } LR11XX_response_size_t;
 
+/*******************************************************************/
+typedef struct {
+    int8_t power;
+    uint8_t pa_duty_cycle;
+} LR11XX_lp_pa_power_settings_t;
+
+/*******************************************************************/
+typedef struct {
+    int8_t power;
+    uint8_t pa_duty_cycle;
+    uint8_t pa_hp_sel;
+} LR11XX_hp_pa_power_settings_t;
+
 /*** LR11XX local global variables ***/
 
 #ifdef LR11XX_DRIVER_TX_ENABLE
 static const int8_t LR11XX_RF_OUTPUT_POWER_DBM_MIN[LR11XX_PA_LAST] = { LR11XX_RF_OUTPUT_POWER_LP_PA_DBM_MIN, LR11XX_RF_OUTPUT_POWER_HP_PA_DBM_MIN };
 static const int8_t LR11XX_RF_OUTPUT_POWER_DBM_MAX[LR11XX_PA_LAST] = { LR11XX_RF_OUTPUT_POWER_LP_PA_DBM_MAX, LR11XX_RF_OUTPUT_POWER_HP_PA_DBM_MAX };
+
+static const LR11XX_lp_pa_power_settings_t LR11XX_LP_PA_POWER_TABLE[LR11XX_LP_PA_POWER_TABLE_SIZE] = {
+    { .power = -15, .pa_duty_cycle = 0x00 }, // -17dBm.
+    { .power = -14, .pa_duty_cycle = 0x00 }, // -16dBm.
+    { .power = -13, .pa_duty_cycle = 0x00 }, // -15dBm.
+    { .power = -12, .pa_duty_cycle = 0x00 }, // -14dBm.
+    { .power = -11, .pa_duty_cycle = 0x00 }, // -13dBm.
+    { .power = -9,  .pa_duty_cycle = 0x00 }, // -12dBm.
+    { .power = -8,  .pa_duty_cycle = 0x00 }, // -11dBm.
+    { .power = -7,  .pa_duty_cycle = 0x00 }, // -10dBm.
+    { .power = -6,  .pa_duty_cycle = 0x00 }, // -9dBm.
+    { .power = -5,  .pa_duty_cycle = 0x00 }, // -8dBm.
+    { .power = -4,  .pa_duty_cycle = 0x00 }, // -7dBm.
+    { .power = -3,  .pa_duty_cycle = 0x00 }, // -6dBm.
+    { .power = -2,  .pa_duty_cycle = 0x00 }, // -5dBm.
+    { .power = -1,  .pa_duty_cycle = 0x00 }, // -4dBm.
+    { .power =  0,  .pa_duty_cycle = 0x00 }, // -3dBm.
+    { .power =  1,  .pa_duty_cycle = 0x00 }, // -2dBm.
+    { .power =  2,  .pa_duty_cycle = 0x00 }, // -1dBm.
+    { .power =  3,  .pa_duty_cycle = 0x00 }, //  0dBm.
+    { .power =  3,  .pa_duty_cycle = 0x01 }, //  1dBm.
+    { .power =  4,  .pa_duty_cycle = 0x01 }, //  2dBm.
+    { .power =  7,  .pa_duty_cycle = 0x00 }, //  3dBm.
+    { .power =  8,  .pa_duty_cycle = 0x00 }, //  4dBm.
+    { .power =  9,  .pa_duty_cycle = 0x00 }, //  5dBm.
+    { .power =  10, .pa_duty_cycle = 0x00 }, //  6dBm.
+    { .power =  12, .pa_duty_cycle = 0x00 }, //  7dBm.
+    { .power =  13, .pa_duty_cycle = 0x00 }, //  8dBm.
+    { .power =  14, .pa_duty_cycle = 0x00 }, //  9dBm.
+    { .power =  13, .pa_duty_cycle = 0x01 }, //  10dBm.
+    { .power =  13, .pa_duty_cycle = 0x02 }, //  11dBm.
+    { .power =  14, .pa_duty_cycle = 0x02 }, //  12dBm.
+    { .power =  14, .pa_duty_cycle = 0x03 }, //  13dBm.
+    { .power =  14, .pa_duty_cycle = 0x04 }, //  14dBm.
+    { .power =  14, .pa_duty_cycle = 0x07 }  //  15dBm.
+};
+
+static const LR11XX_hp_pa_power_settings_t LR11XX_HP_PA_POWER_TABLE[LR11XX_HP_PA_POWER_TABLE_SIZE] = {
+    { .power = 9,   .pa_duty_cycle = 0x00, .pa_hp_sel = 0x00 }, // -9dBm.
+    { .power = 10,  .pa_duty_cycle = 0x00, .pa_hp_sel = 0x00 }, // -8dBm.
+    { .power = 11,  .pa_duty_cycle = 0x00, .pa_hp_sel = 0x00 }, // -7dBm.
+    { .power = 12,  .pa_duty_cycle = 0x00, .pa_hp_sel = 0x00 }, // -6dBm.
+    { .power = 13,  .pa_duty_cycle = 0x00, .pa_hp_sel = 0x00 }, // -5dBm.
+    { .power = 13,  .pa_duty_cycle = 0x01, .pa_hp_sel = 0x00 }, // -4dBm.
+    { .power = 13,  .pa_duty_cycle = 0x02, .pa_hp_sel = 0x00 }, // -3dBm.
+    { .power = 17,  .pa_duty_cycle = 0x02, .pa_hp_sel = 0x00 }, // -2dBm.
+    { .power = 14,  .pa_duty_cycle = 0x04, .pa_hp_sel = 0x00 }, // -1dBm.
+    { .power = 12,  .pa_duty_cycle = 0x00, .pa_hp_sel = 0x01 }, //  0dBm.
+    { .power = 13,  .pa_duty_cycle = 0x00, .pa_hp_sel = 0x01 }, //  1dBm.
+    { .power = 13,  .pa_duty_cycle = 0x01, .pa_hp_sel = 0x01 }, //  2dBm.
+    { .power = 13,  .pa_duty_cycle = 0x02, .pa_hp_sel = 0x01 }, //  3dBm.
+    { .power = 15,  .pa_duty_cycle = 0x00, .pa_hp_sel = 0x02 }, //  4dBm.
+    { .power = 15,  .pa_duty_cycle = 0x04, .pa_hp_sel = 0x01 }, //  5dBm.
+    { .power = 14,  .pa_duty_cycle = 0x02, .pa_hp_sel = 0x02 }, //  6dBm.
+    { .power = 14,  .pa_duty_cycle = 0x01, .pa_hp_sel = 0x03 }, //  7dBm.
+    { .power = 17,  .pa_duty_cycle = 0x04, .pa_hp_sel = 0x02 }, //  8dBm.
+    { .power = 22,  .pa_duty_cycle = 0x00, .pa_hp_sel = 0x01 }, //  9dBm.
+    { .power = 22,  .pa_duty_cycle = 0x01, .pa_hp_sel = 0x01 }, //  10dBm.
+    { .power = 22,  .pa_duty_cycle = 0x02, .pa_hp_sel = 0x01 }, //  11dBm.
+    { .power = 22,  .pa_duty_cycle = 0x03, .pa_hp_sel = 0x01 }, //  12dBm.
+    { .power = 22,  .pa_duty_cycle = 0x00, .pa_hp_sel = 0x03 }, //  13dBm.
+    { .power = 22,  .pa_duty_cycle = 0x01, .pa_hp_sel = 0x03 }, //  14dBm.
+    { .power = 22,  .pa_duty_cycle = 0x04, .pa_hp_sel = 0x02 }, //  15dBm.
+    { .power = 22,  .pa_duty_cycle = 0x01, .pa_hp_sel = 0x04 }, //  16dBm.
+    { .power = 22,  .pa_duty_cycle = 0x02, .pa_hp_sel = 0x04 }, //  17dBm.
+    { .power = 22,  .pa_duty_cycle = 0x01, .pa_hp_sel = 0x06 }, //  18dBm.
+    { .power = 22,  .pa_duty_cycle = 0x03, .pa_hp_sel = 0x05 }, //  19dBm.
+    { .power = 22,  .pa_duty_cycle = 0x03, .pa_hp_sel = 0x07 }, //  20dBm.
+    { .power = 22,  .pa_duty_cycle = 0x04, .pa_hp_sel = 0x06 }, //  21dBm.
+    { .power = 22,  .pa_duty_cycle = 0x04, .pa_hp_sel = 0x07 }  //  22dBm.
+};
 #endif
 #ifdef LR11XX_DRIVER_RX_ENABLE
 static const uint8_t LR11XX_RXBW[LR11XX_RXBW_LAST] = { 0x1F, 0x17, 0x0F, 0x1E, 0x16, 0x0E, 0x1D, 0x15, 0x0D, 0x1C, 0x14, 0x0C, 0x1B, 0x13, 0x0B, 0x1A, 0x12, 0x0A, 0x19, 0x11, 0x09 };
@@ -875,15 +962,16 @@ LR11XX_status_t LR11XX_set_rf_output_power(LR11XX_pa_t pa, int8_t rf_output_powe
         (uint8_t) (LR11XX_OP_CODE_SET_PA_CONFIG >> 0),
         pa,
         pa,
-        0x04,
-        0x07
+        0x00,
+        0x00
     };
     uint8_t command_tx_params[LR11XX_COMMAND_SIZE_SET_TX_PARAMS] = {
         (uint8_t) (LR11XX_OP_CODE_SET_TX_PARAMS >> 8),
         (uint8_t) (LR11XX_OP_CODE_SET_TX_PARAMS >> 0),
-        (uint8_t) (rf_output_power_dbm),
+        (uint8_t) 0x00,
         (uint8_t) (pa_ramp_time)
     };
+    uint8_t pa_power_table_idx = 0;
     // Check parameters.
     if (pa >= LR11XX_PA_LAST) {
         status = LR11XX_ERROR_PA;
@@ -899,6 +987,22 @@ LR11XX_status_t LR11XX_set_rf_output_power(LR11XX_pa_t pa, int8_t rf_output_powe
     }
     if (pa_ramp_time >= LR11XX_PA_RAMP_TIME_LAST) {
         status = LR11XX_ERROR_PA_RAMP_TIME;
+        goto errors;
+    }
+    pa_power_table_idx =  (uint8_t) (rf_output_power_dbm - LR11XX_RF_OUTPUT_POWER_DBM_MIN[pa]);
+    // Set PA power settings.
+    switch (pa) {
+    case LR11XX_PA_LOW_POWER:
+        command_pa_config[4] = LR11XX_LP_PA_POWER_TABLE[pa_power_table_idx].pa_duty_cycle;
+        command_tx_params[2] = LR11XX_LP_PA_POWER_TABLE[pa_power_table_idx].power;
+        break;
+    case LR11XX_PA_HIGH_POWER:
+        command_pa_config[4] = LR11XX_HP_PA_POWER_TABLE[pa_power_table_idx].pa_duty_cycle;
+        command_pa_config[5] = LR11XX_HP_PA_POWER_TABLE[pa_power_table_idx].pa_hp_sel;
+        command_tx_params[2] = LR11XX_HP_PA_POWER_TABLE[pa_power_table_idx].power;
+        break;
+    default:
+        status = LR11XX_ERROR_PA;
         goto errors;
     }
     // Set PA configuration.
