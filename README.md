@@ -13,6 +13,7 @@ Here is the versions compatibility table:
 
 | **lr11xx-driver** | **embedded-utils** |
 |:---:|:---:|
+| [sw2.0](https://github.com/Ludovic-Lesur/lr11xx-driver/releases/tag/sw2.0) | >= [sw5.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw5.0) |
 | [sw1.0](https://github.com/Ludovic-Lesur/lr11xx-driver/releases/tag/sw1.0) | >= [sw5.0](https://github.com/Ludovic-Lesur/embedded-utils/releases/tag/sw5.0) |
 
 # Compilation flags
