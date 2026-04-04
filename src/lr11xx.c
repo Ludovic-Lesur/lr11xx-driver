@@ -343,6 +343,11 @@ static LR11XX_status_t _LR11XX_spi_write_read_8(uint8_t* tx_data, uint8_t* rx_da
     // Perform SPI transfer.
     status = LR11XX_HW_spi_write_read_8(tx_data, rx_data, transfer_size);
     if (status != LR11XX_SUCCESS) goto errors;
+    // Check if command has been successfully executed (STAT1 bits).
+    if (((rx_data[0] >> 1) & 0x07) < 2) {
+        status = LR11XX_ERROR_COMMAND_EXECUTION;
+        goto errors;
+    }
 errors:
     return status;
 }
