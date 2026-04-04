@@ -95,6 +95,18 @@ typedef enum {
 #ifndef LR11XX_DRIVER_DISABLE
 
 /*!******************************************************************
+ * \enum LR11XX_chip_t
+ * \brief LR11XX chips list.
+ *******************************************************************/
+typedef enum {
+    LR11XX_CHIP_NONE = 0x00,
+    LR11XX_CHIP_LR1110 = 0x01,
+    LR11XX_CHIP_LR1120 = 0x02,
+    LR11XX_CHIP_LR1121 = 0x03,
+    LR11XX_CHIP_BOOTLOADER = 0xDF
+} LR11XX_chip_t;
+
+/*!******************************************************************
  * \enum LR11XX_regulation_mode_t
  * \brief LR11XX power regulation modes.
  *******************************************************************/
@@ -462,6 +474,18 @@ LR11XX_status_t LR11XX_de_init(void);
  * \retval      Function execution status.
  *******************************************************************/
 LR11XX_status_t LR11XX_reset(uint8_t reset_enable);
+
+/*!******************************************************************
+ * \fn LR11XX_status_t LR11XX_get_version(LR11XX_chip_t* chip, uint8_t* hw_version, uint8_t* fw_version_major, uint8_t* fw_version_minor)
+ * \brief Get LR11XX version.
+ * \param[in]   none
+ * \param[out]  chip: Pointer to the LR11XX chip.
+ * \param[out]  hw_version: Pointer to the LR11XX hardware version.
+ * \param[out]  fw_version_major: Pointer to the major version of the internal LR11XX firmware.
+ * \param[out]  fw_version_minor: Pointer to the minor version of the internal LR11XX firmware.
+ * \retval      Function execution status.
+ *******************************************************************/
+LR11XX_status_t LR11XX_get_version(LR11XX_chip_t* chip, uint8_t* hw_version, uint8_t* fw_version_major, uint8_t* fw_version_minor);
 
 /*!******************************************************************
  * \fn LR11XX_status_t LR11XX_get_errors(uint16_t* error_stat)

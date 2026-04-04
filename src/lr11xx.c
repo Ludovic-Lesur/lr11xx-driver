@@ -225,6 +225,7 @@ typedef enum {
     LR11XX_RESPONSE_SIZE_READ_BUFFER_8 = 1,
     // System.
     LR11XX_RESPONSE_SIZE_GET_ERRORS = 3,
+    LR11XX_RESPONSE_SIZE_GET_VERSION = 5,
     // Sub-Ghz radio.
     LR11XX_RESPONSE_SIZE_GET_PACKET_STATUS = 4,
     LR11XX_RESPONSE_SIZE_GET_RSSI = 2,
@@ -476,6 +477,29 @@ LR11XX_status_t LR11XX_reset(uint8_t reset_enable) {
         status = LR11XX_HW_set_nreset_gpio(0);
         if (status != LR11XX_SUCCESS) goto errors;
     }
+errors:
+    return status;
+}
+
+/*******************************************************************/
+LR11XX_status_t LR11XX_get_version(LR11XX_chip_t* chip, uint8_t* hw_version, uint8_t* fw_version_major, uint8_t* fw_version_minor) {
+    // Local variables.
+    LR11XX_status_t status = LR11XX_SUCCESS;
+    uint8_t command[LR11XX_COMMAND_SIZE_GET_VERSION] = { (uint8_t) (LR11XX_OP_CODE_GET_VERSION >> 8), (uint8_t) (LR11XX_OP_CODE_GET_VERSION >> 0) };
+    uint8_t response[LR11XX_RESPONSE_SIZE_GET_VERSION];
+    // Check parameters.
+    if ((chip == NULL) || (hw_version == NULL) || (fw_version_major == NULL) || (fw_version_minor == NULL)) {
+        status = LR11XX_ERROR_NULL_PARAMETER;
+        goto errors;
+    }
+    // Send command.
+    status = _LR11XX_read_command(command, LR11XX_COMMAND_SIZE_GET_VERSION, response, LR11XX_RESPONSE_SIZE_GET_VERSION);
+    if (status != LR11XX_SUCCESS) goto errors;
+    // Parse response.
+    (*chip) = (LR11XX_chip_t) response[2];
+    (*hw_version) = response[1];
+    (*fw_version_major) = response[3];
+    (*fw_version_minor) = response[4];
 errors:
     return status;
 }
