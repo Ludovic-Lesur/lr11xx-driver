@@ -999,12 +999,12 @@ LR11XX_status_t LR11XX_set_rf_output_power(LR11XX_pa_t pa, int8_t rf_output_powe
     switch (pa) {
     case LR11XX_PA_LOW_POWER:
         command_pa_config[4] = LR11XX_LP_PA_POWER_TABLE[pa_power_table_idx].pa_duty_cycle;
-        command_tx_params[2] = LR11XX_LP_PA_POWER_TABLE[pa_power_table_idx].power;
+        command_tx_params[2] = (uint8_t) LR11XX_LP_PA_POWER_TABLE[pa_power_table_idx].power;
         break;
     case LR11XX_PA_HIGH_POWER:
         command_pa_config[4] = LR11XX_HP_PA_POWER_TABLE[pa_power_table_idx].pa_duty_cycle;
         command_pa_config[5] = LR11XX_HP_PA_POWER_TABLE[pa_power_table_idx].pa_hp_sel;
-        command_tx_params[2] = LR11XX_HP_PA_POWER_TABLE[pa_power_table_idx].power;
+        command_tx_params[2] = (uint8_t) LR11XX_HP_PA_POWER_TABLE[pa_power_table_idx].power;
         break;
     default:
         status = LR11XX_ERROR_PA;
